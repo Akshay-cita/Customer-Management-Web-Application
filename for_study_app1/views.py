@@ -1,7 +1,7 @@
 from django.shortcuts import render,redirect
 from django.http import HttpResponse
 from .models import *
-
+from .forms import OrderForm,CustomerForm
 
 
 # Create your views here.
@@ -39,3 +39,45 @@ def customer_view(request,pk):
     context={'customers':customers,'orders':orders,'total_order':total_order}
 
     return render(request,'customer.html',context)
+
+def OrderFormView(request):
+
+    form= OrderForm()
+    if request.method =='POST':
+        form=OrderForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('dashboard')
+
+    context={'form':form}
+    return render(request,'order_form.html',context)
+
+def UpdateOrder(request,pk):
+    order=Order.objects.get(id=pk)
+    form= OrderForm(instance=order)
+    if request.method =='POST':
+        form=OrderForm(request.POST,instance=order)
+        if form.is_valid():
+            form.save()
+            return redirect('dashboard')
+
+    context={'form':form}
+    return render(request,'order_form.html',context)
+
+def CreateCustomer(request):
+    form=CustomerForm()
+    if request.method == 'POST':
+        form=CustomerForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('dashboard')
+    context={'form':form}
+    return render(request,'create_customer.html',context)
+
+def DeleteOrder(request,pk):
+    order=Order.objects.get(id=pk)
+    if request.method == 'POST':
+        order.delete()
+        return redirect('dashboard')
+    context={'item':order}
+    return render(request,'delete_order.html',context)
