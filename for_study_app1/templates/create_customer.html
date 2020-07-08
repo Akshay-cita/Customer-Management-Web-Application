@@ -2,12 +2,19 @@
 {%block content%}
 <br>
 <br>
-<form  method="POST">
-  {%csrf_token%}
+<div class="row">
+  <div class="col-md-6">
+    <div class="card card-body">
+      <form  method="POST">
+        {%csrf_token%}
 
-  {{form}}
+        {{form}}
 
-  <input type="submit" name="Submit" >
+        <input type="submit" name="Submit" >
+        </form>
+      </div>
+    </div>
+</div>
 
-</form>
+
 {%endblock%}
