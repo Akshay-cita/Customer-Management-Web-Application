@@ -3,13 +3,18 @@
 
 <br>
 <br>
+<div class="row">
+  <div class="col-md-6">
+    <div class="card card-body">
+      <form  action="" method="POST">
+        {%csrf_token%}
+        {{form}}
 
-<form  action="" method="POST">
-  {%csrf_token%}
-  {{form}}
 
+        <input type="submit" name="Submit" >
 
-  <input type="submit" name="Submit" >
-
-</form>
+      </form>
+    </div>
+  </div>
+</div>
 {%endblock%}
