@@ -107,10 +107,8 @@
 				   		</div>
 					</form>
 				</div>
-
-        {%for msg in messages%}
-          <p>{{msg}}</p>
-        {%endfor%}
+        {{form.errors}}
+        
 
 				<div class="mt-4">
 					<div class="d-flex justify-content-center links">
