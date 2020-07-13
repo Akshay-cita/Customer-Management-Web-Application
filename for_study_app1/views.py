@@ -2,6 +2,7 @@ from django.shortcuts import render,redirect
 from django.http import HttpResponse
 from django.forms import inlineformset_factory
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate,login,logout
 from .models import *
 from .forms import OrderForm,CustomerForm,CreateUserForm
@@ -16,41 +17,49 @@ def initial_page(request):
 
 
 def login_page(request):
-    if request.method =='POST':
-        username=request.POST.get('username')
-        password=request.POST.get('password')
-        user=authenticate(request,username=username,password=password)
-        if user is not None:
-            login(request,user)
-            return redirect('dashboard')
-        else:
-            messages.info(request,'username or password is incorrect')
+    if request.user.is_authenticated:
+        return redirect('dashboard')
+    else:
+        if request.method =='POST':
+            username=request.POST.get('username')
+            password=request.POST.get('password')
+            user=authenticate(request,username=username,password=password)
+            if user is not None:
+                login(request,user)
+                return redirect('dashboard')
+            else:
+                messages.info(request,'username or password is incorrect')
 
-    return render(request,'Login_page.html')
+        return render(request,'Login_page.html')
 
 def logout_user(request):
     logout(request)
     return redirect('login')
 
+def UserPage(request):
+    return render(request,'user.html')
 
 
 def register_page(request):
-    form=CreateUserForm()
+    if request.user.is_authenticated:
+        return redirect('dashboard')
+    else:
+        form=CreateUserForm()
 
 
-    if request.method == 'POST':
-        form=CreateUserForm(request.POST)
+        if request.method == 'POST':
+            form=CreateUserForm(request.POST)
 
-        if form.is_valid():
-            form.save()
-            user=form.cleaned_data.get('username')
-            messages.success(request,'Account was created..'+ user)
-            return redirect('login')
-    context={'form':form}
-    return render(request,'Reg_page.html',context)
+            if form.is_valid():
+                form.save()
+                user=form.cleaned_data.get('username')
+                messages.success(request,'Account was created..'+ user)
+                return redirect('login')
+        context={'form':form}
+        return render(request,'Reg_page.html',context)
 
 
-
+@login_required(login_url='login')
 def dashboard_view(request):
     orders=Order.objects.all()
     customers=Customer.objects.all()
@@ -66,13 +75,13 @@ def dashboard_view(request):
     return render(request,'dashboard.html',context)
 
 
-
+@login_required(login_url='login')
 def product_view(request):
     products=Product.objects.all()
     context={'products':products}
     return render(request,'product.html',context)
 
-
+@login_required(login_url='login')
 def customer_view(request,pk):
     customers=Customer.objects.get(id=pk)
     orders=customers.order_set.all()
@@ -82,7 +91,7 @@ def customer_view(request,pk):
     context={'customers':customers,'orders':orders,'total_order':total_order,'myFilter':myFilter}
     return render(request,'customer.html',context)
 
-
+@login_required(login_url='login')
 def OrderFormView(request,pk):
     OrderFormSet= inlineformset_factory(Customer,Order,fields=('product','status'),extra=10)
     customer=Customer.objects.get(id=pk)
@@ -96,7 +105,7 @@ def OrderFormView(request,pk):
     context={'formset':formset}
     return render(request,'order_form.html',context)
 
-
+@login_required(login_url='login')
 def UpdateOrder(request,pk):
     order=Order.objects.get(id=pk)
     form= OrderForm(instance=order)
@@ -109,7 +118,7 @@ def UpdateOrder(request,pk):
     context={'form':form}
     return render(request,'order_form.html',context)
 
-
+@login_required(login_url='login')
 def CreateCustomer(request):
     form=CustomerForm()
     if request.method == 'POST':
@@ -120,7 +129,7 @@ def CreateCustomer(request):
     context={'form':form}
     return render(request,'create_customer.html',context)
 
-
+@login_required(login_url='login')
 def DeleteOrder(request,pk):
     order=Order.objects.get(id=pk)
     if request.method == 'POST':
