@@ -35,8 +35,33 @@ def logout_user(request):
     logout(request)
     return redirect('login')
 
+@login_required(login_url='login')
+@allowed_users(allowed_roles=['customer'])
 def UserPage(request):
-    return render(request,'user.html')
+    orders=request.user.customer.order_set.all()
+    delivered=orders.filter(status='Delivered').count()
+    pending=orders.filter(status='Pending').count()
+    total_orders=orders.count()
+
+    context={'orders':orders,'delivered':delivered,'pending':pending,'total_orders':total_orders}
+    return render(request,'user.html',context)
+
+
+@login_required(login_url='login')
+@allowed_users(allowed_roles=['customer'])
+def accountSettings(request):
+    user=request.user.customer
+    form=CustomerForm(instance=user)
+    if request.method=='POST':
+        form=CustomerForm(request.POST,request.FILES,instance=user)
+        if form.is_valid():
+            form.save()
+
+
+    context={'form':form}
+    return render(request,'account_settings.html',context)
+
+
 
 @unauthenticated_user
 def register_page(request):
@@ -49,9 +74,7 @@ def register_page(request):
         if form.is_valid():
             user=form.save()
             username=form.cleaned_data.get('username')
-            group=Group.objects.get(name='customer')
-            user.groups.add(group)
-            
+
             messages.success(request,'Account was created..'+ username)
             return redirect('login')
     context={'form':form}
