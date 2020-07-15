@@ -1,10 +1,14 @@
 from django.urls import path
 from for_study_app1 import views
 
+
+
+
 urlpatterns = [
 path('cmr',views.initial_page,name='cmr'),
 path('login/',views.login_page,name='login'),
 path('user/',views.UserPage,name='user'),
+path('account/',views.accountSettings,name='account'),
 path('logout/',views.logout_user,name='logout'),
 path('register/',views.register_page,name='register'),
 path('cmr/dashboard/',views.dashboard_view,name='dashboard'),
