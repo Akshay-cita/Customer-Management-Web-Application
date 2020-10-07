@@ -1,0 +1,32 @@
+{%extends 'Base.html'%}
+{%block content%}
+<br>
+<div class="col-md">
+  <h5>Customers List</h5>
+  <hr>
+  <br>
+
+
+  <div class="card card-body">
+    <table class="table table-sm">
+
+      <tr>
+        <th>Customer</th>
+        <th>Email Id</th>
+        <th>Phone</th>
+        
+      </tr>
+      {%for customer in customer%}
+      <tr>
+        <td>{{customer.name}}</td>
+        <td>{{customer.email}}</td>
+        <td>{{customer.phone}}</td>
+        
+      </tr>
+      {%endfor%}
+    </table>
+
+  </div>
+
+</div>
+{%endblock%}
